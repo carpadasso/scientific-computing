@@ -75,7 +75,7 @@ int AlmostEqualRelative(Double_t A, Double_t B)
 
 /* Gera a aproximacao para o valor de pi */
 void calculaAproximacao(double tolerancia, Double_t *aproximacao, Double_t *erro_aprox, 
-                        int *iteracoes, int *num_flops)
+                        int *iteracoes, long long int *num_flops)
 {
    Double_t e, tol;
    double atual, anterior;
@@ -106,7 +106,8 @@ int main(int argc, char** argv)
 
    Double_t aproximacao, erro_aprox;
    Double_t aprox_baixo, aprox_cima;
-   int iteracoes, num_flops;
+   int iteracoes;
+   long long int num_flops;
 
    // Processamento 1:
    // ARRENDODAMENTO PARA BAIXO
@@ -133,13 +134,13 @@ int main(int argc, char** argv)
     * <APROXIMAÇÃO PARA CIMA>    <APROXIMAÇÃO PARA CIMA EM HEX>
     * <DIFERENÇA DE ULPS DAS APROXIMAÇÕES> 
     * <NUMERO DE FLOPS> */
-   printf("\n%d\n", iteracoes);
-   printf("%.15e %016llX\n", erro_aprox.d, erro_aprox.i);
-   printf("%.15e %016llX\n", erro_abs.d, erro_abs.i);
-   printf("%.15e %016llX\n", aprox_baixo.d, aprox_baixo.i);
-   printf("%.15e %016llX\n", aprox_cima.d, aprox_cima.i);
+   printf("%d\n", iteracoes);
+   printf("%.15e %llX\n", erro_aprox.d, erro_aprox.i);
+   printf("%.15e %llX\n", erro_abs.d, erro_abs.i);
+   printf("%.15e %llX\n", aprox_baixo.d, aprox_baixo.i);
+   printf("%.15e %llX\n", aprox_cima.d, aprox_cima.i);
    printf("%d\n", abs(aprox_baixo.i - aprox_cima.i - 1));
-   printf("%d\n", num_flops);
+   printf("%lld\n", num_flops);
 
    return 0;
 }
