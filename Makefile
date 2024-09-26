@@ -19,7 +19,7 @@ OBJ = $(C_SOURCE:.c=.o)
 CC = gcc
 
 # Flags do Compilador
-CC_FLAGS= -c -Wall -Wextra -O2
+CC_FLAGS= -c -Wall
 
 # ----------------------------
 
