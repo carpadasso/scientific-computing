@@ -134,13 +134,13 @@ int main(int argc, char** argv)
     * <APROXIMAÇÃO PARA CIMA>    <APROXIMAÇÃO PARA CIMA EM HEX>
     * <DIFERENÇA DE ULPS DAS APROXIMAÇÕES> 
     * <NUMERO DE FLOPS> */
-   printf("n = %d\n", iteracoes);
-   printf("EA aprox = %.15e (%llX)\n", erro_aprox.d, erro_aprox.i);
-   printf("EA exato = %.15e (%llX)\n", erro_abs.d, erro_abs.i);
-   printf("PI'  = %.15e (%llX)\n", aprox_baixo.d, aprox_baixo.i);
-   printf("PI'' = %.15e (%llX)\n", aprox_cima.d, aprox_cima.i);
-   printf("ULPs = %d\n", abs(aprox_baixo.i - aprox_cima.i - 1));
-   printf("FLOPs = %lld\n", num_flops);
+   printf("%d\n", iteracoes);
+   printf("%.15e %llX", erro_aprox.d, erro_aprox.i);
+   printf("%.15e %llX\n", erro_abs.d, erro_abs.i);
+   printf("%.15e %llX\n", aprox_baixo.d, aprox_baixo.i);
+   printf("%.15e %llX\n", aprox_cima.d, aprox_cima.i);
+   printf("%d\n", abs(aprox_baixo.i - aprox_cima.i - 1));
+   printf("%lld\n", num_flops);
 
    return 0;
 }
