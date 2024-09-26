@@ -4,7 +4,7 @@
 # ---------------------------------
 
 # Nome do Projeto
-PROJECT = CalculatePi
+PROJECT = pi
 
 # Arquivos .c
 C_SOURCE = $(wildcard *.c)
