@@ -8,79 +8,62 @@
 #include <math.h>
 
 /* Tipo Double_t:
- * Usado para representar o número Double de diferentes
- * maneiras, como inteiro de 64 bits e as partes do ponto
- * flutuante. */
+ * Usado para representar o número Double de duas diferentes
+ * maneiras: como ponto flutuante de precisão dupla e inteiro de
+ * 64 bits. */
 typedef union
 {
     int64_t i;
     double d;
 } Double_t;
 
-/* Calcula n! de forma iterativa. */
-double fatorial(int n)
-{
-   double produto = 1.0;
-   long int valor = 1;
-
-   if (n == 0) return produto;
-
-   for (int i = 1; i <= n; ++i)
-   {
-      produto = produto * valor;
-      valor = valor + 1;
-   }
-
-   return produto;
-}
-
-/* Calcula x^e de forma iterativa. */
-long int potencia(double x, int e)
-{
-   long int produto = 1;
-
-   if (e == 0) return produto;
-
-   for (int i = 1; i <= e; ++i)
-      produto = produto * x;
-
-   return produto;
-}
-
 /* >> Calcula o somatório abaixo:
  *     k=0 to n of (2^k * (k!)^2) / (2k + 1)! 
  * - Utiliza o valor da iteração anterior para reduzir FLOPs.
+ * - Utiliza o resultado anterior de s(k) para reduzir FLOPs.
  * - Contabiliza o número de FLOPs nos cálculos. */
-double somatorioPi(int n, double valor_anterior, long long int *num_flops)
+double somatorioPi(int n, double valor_anterior, double *expressao, long long int *num_flops)
 {
-   double valor = 0;
-
    if (n == 0) return 1.0;
 
-   valor = valor_anterior + (potencia(2, n) * ((fatorial(n) * fatorial(n)) / fatorial(2*n + 1)));
-   *num_flops += 4*n + 5;
+   // Calcula o próximo valor de s(k)
+   (*expressao) = (n * (*expressao)) / (2*n + 1);
 
-   return valor;
+   // Adiciona a contagem de FLOPs
+   // Cada iteração do somatório adiciona 3 FLOPs
+   // (1 multiplicação, 1 divisão e 1 soma)
+   *num_flops += 3;
+
+   return (valor_anterior + (*expressao));
 }
 
 /* Calcula a aproximação para PI/2 baseada na tolerância dada. */
 void calculaAproximacao(double tolerancia, Double_t *aproximacao, Double_t *erro_aprox, 
                         int *iteracoes, long long int *num_flops)
 {
-   double anterior = somatorioPi(0, 0, num_flops);
-   double atual = somatorioPi(1, anterior, num_flops);
+   double expressao = 1.0;
 
+   // Primeira Iteração (k = 0)
+   double anterior = somatorioPi(0, 0, &expressao, num_flops);
+
+   // Segunda Iteração (k = 1)
+   double atual = somatorioPi(1, anterior, &expressao, num_flops);
+
+   // Erro Inicial
    double erro = fabs(atual - anterior);
 
    int k = 2;
-   (*num_flops)++;
    while(erro > tolerancia)
    {
+      // Anterior recebe s(k-1)
       anterior = atual;
-      atual = somatorioPi(k, anterior, num_flops);
+
+      // Calcula s(k) e joga em Atual
+      atual = somatorioPi(k, anterior, &expressao, num_flops);
+      
+      // Calcula Erro
       erro = fabs(atual - anterior);
       k++;
-      (*num_flops) += 1;
    }
 
    aproximacao->d = atual;
