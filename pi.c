@@ -15,100 +15,77 @@ typedef union
 {
     int64_t i;
     double d;
-    struct
-    {   // Bitfields for exploration (64 bits = sign|exponent|mantissa)
-        uint64_t mantissa : 52; // primeiros 52 bits (da direita para a esquerda)
-        uint64_t exponent : 11; // próximos 11 bits
-        uint64_t sign : 1;      // proximo bit (ou seja, o bit mais a esquerda)
-    } parts;
 } Double_t;
 
-/* Retorna n! */
+/* Calcula n! de forma iterativa. */
 double fatorial(int n)
 {
    double produto = 1.0;
-   double valor = 1.0;
+   long int valor = 1;
 
    if (n == 0) return produto;
 
    for (int i = 1; i <= n; ++i)
    {
       produto = produto * valor;
-      valor = valor + 1.0;
+      valor = valor + 1;
    }
 
    return produto;
 }
 
-/* Retorna x^e */
-double potencia(double x, int e)
+/* Calcula x^e de forma iterativa. */
+long int potencia(double x, int e)
 {
-   double produto = 1.0;
+   long int produto = 1;
 
    if (e == 0) return produto;
 
    for (int i = 1; i <= e; ++i)
-   {
       produto = produto * x;
-   }
 
    return produto;
 }
 
-/* Calcula o somatório abaixo:
- * k=0 to n of (2^k * (k!)^2) / (2k + 1)! */
-double somatorioPi(int n)
+/* >> Calcula o somatório abaixo:
+ *     k=0 to n of (2^k * (k!)^2) / (2k + 1)! 
+ * - Utiliza o valor da iteração anterior para reduzir FLOPs.
+ * - Contabiliza o número de FLOPs nos cálculos. */
+double somatorioPi(int n, double valor_anterior, long long int *num_flops)
 {
-   double soma = 0;
+   double valor = 0;
 
    if (n == 0) return 1.0;
 
-   for (int k = 0; k <= n; ++k)
-      soma = soma + ((potencia(2.0, k) * (fatorial(k) * fatorial(k))) / fatorial(2*k + 1));
+   valor = valor_anterior + (potencia(2, n) * ((fatorial(n) * fatorial(n)) / fatorial(2*n + 1)));
+   *num_flops += 4*n + 5;
 
-   return soma;
+   return valor;
 }
 
-int AlmostEqualRelative(Double_t A, Double_t B)
-{
-    // Calculate the difference.
-    Double_t diff, largest, relEpsilon;
-    diff.d = fabs(A.d - B.d);
-    A.d = fabs(A.d);
-    B.d = fabs(B.d);
-    // Find the largest
-    largest.d = (B.d > A.d) ? B.d : A.d;
-    relEpsilon.d = largest.d * DBL_EPSILON;
-    
-    if (diff.d <= relEpsilon.d)
-        return 1;
-    return 0;
-}
-
-/* Gera a aproximacao para o valor de pi */
+/* Calcula a aproximação para PI/2 baseada na tolerância dada. */
 void calculaAproximacao(double tolerancia, Double_t *aproximacao, Double_t *erro_aprox, 
                         int *iteracoes, long long int *num_flops)
 {
-   Double_t e, tol;
-   double atual, anterior;
-   anterior = somatorioPi(0);
-   atual = somatorioPi(1);
-   
-   tol.d = tolerancia;
-   e.d = fabs(atual - anterior);
+   double anterior = somatorioPi(0, 0, num_flops);
+   double atual = somatorioPi(1, anterior, num_flops);
+
+   double erro = fabs(atual - anterior);
+
    int k = 2;
-   while(k < 49)
+   (*num_flops)++;
+   while(erro > tolerancia)
    {
       anterior = atual;
-      atual = somatorioPi(k);
-      e.d = fabs(atual - anterior);
+      atual = somatorioPi(k, anterior, num_flops);
+      erro = fabs(atual - anterior);
       k++;
+      (*num_flops) += 1;
    }
 
    aproximacao->d = atual;
-   erro_aprox->d = e.d;
+   erro_aprox->d = erro;
    *iteracoes = k;
-   *num_flops = 4*(k-1) + 1;
 }
 
 int main(int argc, char** argv)
@@ -124,6 +101,8 @@ int main(int argc, char** argv)
    // Processamento 1:
    // ARRENDODAMENTO PARA BAIXO
    fesetround(FE_DOWNWARD);
+   iteracoes = 0;
+   num_flops = 0;
    calculaAproximacao(tolerancia, &aproximacao, &erro_aprox, &iteracoes, &num_flops);
    aprox_baixo = aproximacao;
    aprox_baixo.d = 2 * aprox_baixo.d;
@@ -131,15 +110,20 @@ int main(int argc, char** argv)
    // Processamento 2:
    // ARRENDODAMENTO PARA CIMA
    fesetround(FE_UPWARD);
+   iteracoes = 0;
+   num_flops = 0;
    calculaAproximacao(tolerancia, &aproximacao, &erro_aprox, &iteracoes, &num_flops);
    aprox_cima = aproximacao;
    aprox_cima.d = 2 * aprox_cima.d;
 
+   // Constante PI
+   // Utilizada para calcular o Erro Exato
    Double_t pi;
    pi.d = M_PI;
 
-   Double_t erro_abs;
-   erro_abs.d = fabs(aprox_cima.d - pi.d);
+   // Erro Absoluto EXATO
+   Double_t erro_exato;
+   erro_exato.d = fabs(aprox_cima.d - pi.d);
 
    /* Modelo de Impressão:
     * <NÚMERO DE ITERAÇÕES>
@@ -151,7 +135,7 @@ int main(int argc, char** argv)
     * <NUMERO DE FLOPS> */
    printf("%d\n", iteracoes);
    printf("%.15e %llX\n", erro_aprox.d, erro_aprox.i);
-   printf("%.15e %llX\n", erro_abs.d, erro_abs.i);
+   printf("%.15e %llX\n", erro_exato.d, erro_exato.i);
    printf("%.15e %llX\n", aprox_baixo.d, aprox_baixo.i);
    printf("%.15e %llX\n", aprox_cima.d, aprox_cima.i);
    printf("%d\n", abs(aprox_baixo.i - aprox_cima.i - 1));
