@@ -1,0 +1,19 @@
+---------------------------------
+◈ Nome: Leonardo Amorim Carpwiski
+◈ GRR:  20232331
+---------------------------------
+
+Atividade: Exercício Prático 01
+
+>> Dificuldades encontradas
+• Determinar a condição de parada do laço
+de iteração ✓
+• Calcular o somatório, gerando um valor
+representável em double ✓
+• Tornar o cálculo do somatório eficiente,
+reduzindo drasticamente o número de FLOPs ✓
+
+>> Limitações do Algoritmo
+⚠ A tolerância de entrada não pode ser um valor
+não representável em double, caso contrário entra
+em repetição infinita!
