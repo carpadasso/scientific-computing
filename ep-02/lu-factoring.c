@@ -13,32 +13,28 @@ unsigned int encontraMax(double **A, unsigned int n, unsigned int i)
    return max;
 }
 
-void trocaLinha(double **L, double **U, unsigned int i, unsigned int iPivo)
+void trocaLinha(double **U, unsigned int i, unsigned int iPivo)
 {
    double *tmp_p;
-
-   tmp_p = L[i];
-   L[i] = L[iPivo];
-   L[iPivo] = tmp_p;
 
    tmp_p = U[i];
    U[i] = U[iPivo];
    U[iPivo] = tmp_p;
 }
 
+// Parte I: Cálculo das Matrizes L & U
+// Faz-se a Eliminação Gaussiana
+// Guarda os valores de m em L
+// O escalonamento é feito em cima de U
 void fatoracaoLU(double **L, double **U, double **Inv, unsigned int n)
 {
    int i, j, k;
 
-   // Parte I: Cálculo das Matrizes L & U
-   // Faz-se a Eliminação Gaussiana
-   // Guarda os valores de m em L
-   // O escalonamento é feito em cima de U
    for (i = 0; i < n; i++)
    {
       unsigned int iPivo = encontraMax(U, n, i);
       if (i != iPivo)
-         trocaLinha(L, U, i, iPivo);
+         trocaLinha(U, i, iPivo);
       
       for (k = i + 1; k < n; ++k)
       {
@@ -53,16 +49,22 @@ void fatoracaoLU(double **L, double **U, double **Inv, unsigned int n)
             U[k][j] -= U[i][j] * m;
       }
    }
+}
 
-   // Parte II: Cálculo da Inversa
-   // b: Recebe o vetor coluna da Identidade
-   // y: Recebe o vetor resultante de L
-   // x: Recebe o vetor resultante de U
-   // i: Itera nas colunas da Inversa
-   // No final, Inv contém a inversa da matriz
-   double *y, *b;
-   double soma = 0.0;
+// Parte II: Cálculo da Inversa
+// b: Recebe o vetor coluna da Identidade
+// y: Recebe o vetor resultante de L
+// x: Recebe o vetor resultante de U
+// i: Itera nas colunas da Inversa
+// No final, Inv contém a inversa da matriz
+void calculaInversa(double **L, double **U, double **Inv, unsigned int n)
+{
+   int i, j, k;
+   double *x, *y, *b;
+   double soma;
+
    b = (double*) malloc(n*sizeof(double));
+   x = (double*) malloc(n*sizeof(double));
    y = (double*) malloc(n*sizeof(double));
 
    for (i = 0; i < n; ++i)
@@ -76,13 +78,25 @@ void fatoracaoLU(double **L, double **U, double **Inv, unsigned int n)
       y[0] = b[0];
       for (j = 1; j < n; ++j)
       {
+         soma = 0.0;
          for (k = 0; k < j; ++k)
             soma += L[j][k] * y[k];
          y[j] = b[j] - soma;
       }
 
       // Parte II.2: Cálculo com U
+      x[n - 1] = y[n - 1] / U[n - 1][n - 1];
+      for (j = n - 2; j >= 0; --j)
+      {
+         soma = 0.0;
+         for (k = n - 1; k >= j; --k)
+            soma += U[j][k] * x[k];
+      }
    }
+
+   free(b);
+   free(x);
+   free(y);
 }
 
 int main()
@@ -105,6 +119,7 @@ int main()
    L = (double**) malloc(n*n*sizeof(double));
    U = (double**) malloc(n*n*sizeof(double));
    Inv = (double**) malloc(n*n*sizeof(double));
+
    // Arruma as matrizes L e U:
    // L -> Diagonal Principal = 1
    // U -> Cópia da matriz A
@@ -116,7 +131,12 @@ int main()
       for (j = 0; j < n; ++j)
          U[i][j] = A[i][j];
 
-   // Execução do Método: FATORAÇÃO LU
    fesetround(FE_UPWARD);
    fatoracaoLU(L, U, Inv, n);
+   calculaInversa(L, U, Inv, n);
+
+   free(A);
+   free(L);
+   free(U);
+   free(Inv);
 }
