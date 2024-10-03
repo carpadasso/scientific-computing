@@ -26,16 +26,21 @@ void trocaLinha(double **L, double **U, unsigned int i, unsigned int iPivo)
    U[iPivo] = tmp_p;
 }
 
-void fatoracaoLU(double **L, double **U, double *x, unsigned int n)
+void fatoracaoLU(double **L, double **U, double **Inv, unsigned int n)
 {
+   int i, j, k;
+
    // Parte I: Cálculo das Matrizes L & U
-   for (int i = 0; i < n; i++)
+   // Faz-se a Eliminação Gaussiana
+   // Guarda os valores de m em L
+   // O escalonamento é feito em cima de U
+   for (i = 0; i < n; i++)
    {
       unsigned int iPivo = encontraMax(U, n, i);
       if (i != iPivo)
          trocaLinha(L, U, i, iPivo);
       
-      for (int k = i + 1; k < n; ++k)
+      for (k = i + 1; k < n; ++k)
       {
          double m = U[k][i] / U[i][i];
 
@@ -44,17 +49,45 @@ void fatoracaoLU(double **L, double **U, double *x, unsigned int n)
 
          // Atualiza valores de U
          U[k][i] = 0.0;
-         for (int j = i + 1; j < n; ++j)
+         for (j = i + 1; j < n; ++j)
             U[k][j] -= U[i][j] * m;
       }
    }
 
    // Parte II: Cálculo da Inversa
+   // b: Recebe o vetor coluna da Identidade
+   // y: Recebe o vetor resultante de L
+   // x: Recebe o vetor resultante de U
+   // i: Itera nas colunas da Inversa
+   // No final, Inv contém a inversa da matriz
+   double *y, *b;
+   double soma = 0.0;
+   b = (double*) malloc(n*sizeof(double));
+   y = (double*) malloc(n*sizeof(double));
+
+   for (i = 0; i < n; ++i)
+   {
+      // b := Vetor Coluna de I[n x n]
+      for (j = 0; j < n; ++j)
+         b[j] = 0.0;
+      b[i] = 1.0;
+
+      // Parte II.1: Cálculo com L
+      y[0] = b[0];
+      for (j = 1; j < n; ++j)
+      {
+         for (k = 0; k < j; ++k)
+            soma += L[j][k] * y[k];
+         y[j] = b[j] - soma;
+      }
+
+      // Parte II.2: Cálculo com U
+   }
 }
 
 int main()
 {
-   double **A, **L, **U, *x;
+   double **A, **L, **U, **Inv;
    unsigned int n;
    int i, j;
 
@@ -71,7 +104,7 @@ int main()
 
    L = (double**) malloc(n*n*sizeof(double));
    U = (double**) malloc(n*n*sizeof(double));
-
+   Inv = (double**) malloc(n*n*sizeof(double));
    // Arruma as matrizes L e U:
    // L -> Diagonal Principal = 1
    // U -> Cópia da matriz A
@@ -85,5 +118,5 @@ int main()
 
    // Execução do Método: FATORAÇÃO LU
    fesetround(FE_UPWARD);
-   fatoracaoLU(L, U, x, n);
+   fatoracaoLU(L, U, Inv, n);
 }
