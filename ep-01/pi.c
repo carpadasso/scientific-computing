@@ -38,7 +38,7 @@ double somatorioPi(int n, double valor_anterior, double *expressao, long long in
 }
 
 /* Calcula a aproximação para PI/2 baseada na tolerância dada. */
-void calculaAproximacao(double tolerancia, Double_t *aproximacao, Double_t *erro_aprox, 
+void calculaAproximacao(double tolerancia, double *aproximacao, double *erro_aprox, 
                         int *iteracoes, long long int *num_flops)
 {
    double expressao = 1.0;
@@ -66,8 +66,8 @@ void calculaAproximacao(double tolerancia, Double_t *aproximacao, Double_t *erro
       k++;
    }
 
-   aproximacao->d = atual;
-   erro_aprox->d = erro;
+   *aproximacao = atual;
+   *erro_aprox = erro;
    *iteracoes = k;
 }
 
@@ -76,8 +76,9 @@ int main(int argc, char** argv)
    double tolerancia;
    scanf("%lf", &tolerancia);
 
-   Double_t aproximacao, erro_aprox;
+   double aproximacao, erro_aprx;
    Double_t aprox_baixo, aprox_cima;
+
    int iteracoes;
    long long int num_flops;
 
@@ -86,8 +87,8 @@ int main(int argc, char** argv)
    fesetround(FE_DOWNWARD);
    iteracoes = 0;
    num_flops = 0;
-   calculaAproximacao(tolerancia, &aproximacao, &erro_aprox, &iteracoes, &num_flops);
-   aprox_baixo = aproximacao;
+   calculaAproximacao(tolerancia, &aproximacao, &erro_aprx, &iteracoes, &num_flops);
+   aprox_baixo.d = aproximacao;
    aprox_baixo.d = 2 * aprox_baixo.d;
 
    // Processamento 2:
@@ -95,14 +96,18 @@ int main(int argc, char** argv)
    fesetround(FE_UPWARD);
    iteracoes = 0;
    num_flops = 0;
-   calculaAproximacao(tolerancia, &aproximacao, &erro_aprox, &iteracoes, &num_flops);
-   aprox_cima = aproximacao;
+   calculaAproximacao(tolerancia, &aproximacao, &erro_aprx, &iteracoes, &num_flops);
+   aprox_cima.d = aproximacao;
    aprox_cima.d = 2 * aprox_cima.d;
 
    // Constante PI
    // Utilizada para calcular o Erro Exato
    Double_t pi;
    pi.d = M_PI;
+
+   // Erro Absoluto APROXIMADO
+   Double_t erro_aprox;
+   erro_aprox.d = erro_aprx;
 
    // Erro Absoluto EXATO
    Double_t erro_exato;
