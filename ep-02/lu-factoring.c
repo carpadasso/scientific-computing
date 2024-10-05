@@ -99,41 +99,56 @@ void calculaInversa(double **L, double **U, double **Inv, unsigned int n)
    free(y);
 }
 
+void imprimeMatriz(double **A, unsigned int n)
+{
+   for (int i = 0; i < n; ++i)
+   {
+      for (int j = 0; j < n; ++j)
+         printf("%.15e ", A[i][j]);
+      printf("\n");
+   }
+}
+
 int main()
 {
    double **A, **L, **U, **Inv;
-   unsigned int n;
-   int i, j;
+   unsigned int n, i, j;
+
+   //fesetround(FE_DOWNWARD);
 
    // Lê a ordem da matriz A[n x n]
    scanf("%u", &n);
-   if (n <= 0)
-      return 1;
+   if (n <= 0) return 1;
 
    // Lê a matriz a ser invertida:
-   A = (double**) malloc(n*n*sizeof(double));
+   A = (double**) malloc(n * n * sizeof(double));
    for (i = 0; i < n; ++i)
       for (j = 0; j < n; ++j)
-         scanf("%lf", &A[i][j]);
+         scanf("%lf", &(A[i][j]));
 
-   L = (double**) malloc(n*n*sizeof(double));
-   U = (double**) malloc(n*n*sizeof(double));
-   Inv = (double**) malloc(n*n*sizeof(double));
+   L = (double**) malloc(n * n * sizeof(double));
+   U = (double**) malloc(n * n * sizeof(double));
+   Inv = (double**) malloc(n * n * sizeof(double));
 
    // Arruma as matrizes L e U:
    // L -> Diagonal Principal = 1
    // U -> Cópia da matriz A
    for (i = 0; i < n; ++i)
       for (j = 0; j < n; ++j)
-         L[i][j] = (i == j) ? 1 : 0;
+         L[i][j] = ((i == j) ? 1 : 0);
    
    for (i = 0; i < n; ++i)
       for (j = 0; j < n; ++j)
          U[i][j] = A[i][j];
 
-   fesetround(FE_UPWARD);
-   fatoracaoLU(L, U, Inv, n);
-   calculaInversa(L, U, Inv, n);
+   //fatoracaoLU(L, U, Inv, n);
+   //calculaInversa(L, U, Inv, n);
+
+   printf("\nRESULTADO DE L:\n");
+   imprimeMatriz(L, n);
+   printf("\n");
+   printf("RESULTADO DE U:\n");
+   imprimeMatriz(U, n);
 
    free(A);
    free(L);
