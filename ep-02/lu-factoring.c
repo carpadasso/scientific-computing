@@ -146,7 +146,9 @@ int main()
 
    printf("\nRESULTADO DE L:\n");
    imprimeMatriz(L, n);
+
    printf("\n");
+   
    printf("RESULTADO DE U:\n");
    imprimeMatriz(U, n);
 
