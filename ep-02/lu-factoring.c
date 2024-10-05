@@ -114,7 +114,7 @@ int main()
    double **A, **L, **U, **Inv;
    unsigned int n, i, j;
 
-   //fesetround(FE_DOWNWARD);
+   fesetround(FE_DOWNWARD);
 
    // Lê a ordem da matriz A[n x n]
    scanf("%u", &n);
