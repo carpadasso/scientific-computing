@@ -77,30 +77,47 @@ void copiaMatriz(double **A, double **B, unsigned int n);
  */
 void geraIdentidade(double **I, unsigned int n);
 
-// Função fatoracaoLU()
-/* 
+// Função subtraiMatriz()
+/* Recebe três ponteiros para matriz quadrada de doubles, A[], B[] e R[], e a
+ * ordem/tamanho das matrizes (Ordem(A) = Ordem(B) = Ordem(R)). Em seguida,
+ * efetua a subtração da matriz A pela B e armazena o resultado em R, ou seja,
+ * A[i, j] - B[i, j] = R[i, j], para todo i, j < n.
+ * 
  * Parâmetros:
- * - double **L: Matriz previamente alocada e processada L
- * - double **U: Matriz previamente alocada e processada U
- * - unsigned int n: Ordem/tamanho das matrizes L e U 
+ * - double **A: Matriz quadrada que serve como Minuendo
+ * - double **B: Matriz quadrada que serve como Subtraendo
+ * - double **R: Matriz quadrada que serve como a Diferença de A e B
+ * - unsigned int n: Ordem/tamanho das matrizes A, B e R
  */
 void subtraiMatriz(double **A, double **B, double **R, unsigned int n);
 
-// Função fatoracaoLU()
-/* 
+// Função multiplicaMatriz()
+/* Recebe três ponteiros para matriz quadrada de doubles, A[], B[] e R[], e a
+ * ordem/tamanho das matrizes (Ordem(A) = Ordem(B) = Ordem(R)). Em seguida,
+ * efetua a multiplicação da matriz A pela B e armazena o resultado em R através
+ * da mutiplicação padrão de matrizes.
+ * 
  * Parâmetros:
- * - double **L: Matriz previamente alocada e processada L
- * - double **U: Matriz previamente alocada e processada U
- * - unsigned int n: Ordem/tamanho das matrizes L e U 
+ * - double **A: Matriz quadrada que serve como Fator número 1
+ * - double **B: Matriz quadrada que serve como Fator número 2
+ * - double **R: Matriz quadrada que serve como o Produto de A e B
+ * - unsigned int n: Ordem/tamanho das matrizes A, B e R
  */
 void multiplicaMatriz(double **A, double **B, double **R, unsigned int n);
 
-// Função fatoracaoLU()
-/* 
+// Função calculaNorma()
+/* A função recebe um ponteiro para matriz quadrada de doubles A[] e a
+ * ordem/tamanho da matriz. Em seguida, calcula a norma L2 para cada uma das
+ * colunas de A[] usando a expressão abaixo:
+ *  NormaL2(col, n) = sqrt(sum of i = 0 to n of (A[i][col])^2)
+ * 
+ * Após o cálculo da norma L2 de cada coluna, a função calcula e retorna a 
+ * média simples das normas L2 calculadas.
+ * 
  * Parâmetros:
- * - double **L: Matriz previamente alocada e processada L
- * - double **U: Matriz previamente alocada e processada U
- * - unsigned int n: Ordem/tamanho das matrizes L e U 
+ * - double **A: Matriz quadrada que se deseja calcular a média das normas L2
+ * das colunas da matriz
+ * - unsigned int n: Ordem/tamanho da matriz A[]
  */
 double calculaNorma(double **A, unsigned int n);
 

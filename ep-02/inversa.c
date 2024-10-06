@@ -3,7 +3,19 @@
 /* ====================
  * Funções Auxiliares
  * ==================== */
-// Função encontraMax()
+// Função alocaMatriz()
+/* A função recebe um ponteiro para matriz quadrada de doubles A[], a ordem da
+ * matriz e um índice de uma linha da matriz. A função então percorre a primeira
+ * coluna da submatriz A[i..n][i..n] e retorna o índice da linha do maior
+ * elemento dessa coluna.
+ * 
+ * Parâmetros:
+ * - double **A: Matriz quadrada que se deseja encontrar o elemento máximo da
+ * primeira coluna da submatriz A[i..n][i..n].
+ * - unsigned int n: Ordem/tamanho da matriz A[]
+ * - unsigned int i: Índice da linha 'i' que define a submatriz onde acontecerá
+ * a busca
+ */
 unsigned int encontraMax(double **A, unsigned int n, unsigned int i)
 {
    unsigned int max = i;
@@ -15,13 +27,22 @@ unsigned int encontraMax(double **A, unsigned int n, unsigned int i)
 }
 
 // Função trocaLinha()
-void trocaLinha(double **A, unsigned int i, unsigned int iPivo)
+/* A função recebe um ponteiro para matriz quadrada de doubles A[] e dois
+ * índices de duas linhas da matriz. Em seguida, efetua a troca das linhas
+ * realizando a troca dos ponteiros das linhas.
+ * 
+ * Parâmetros:
+ * - double **A: Matriz quadrada que se deseja trocar duas linhas dadas
+ * - unsigned int i1: Índice da linha 1 que se deseja trocar com a linha 2
+ * - unsigned int i2: Índice da linha 2 que se deseja trocar com a linha 1
+ */
+void trocaLinha(double **A, unsigned int i1, unsigned int i2)
 {
    double *tmp_p;
 
-   tmp_p = A[i];
-   A[i] = A[iPivo];
-   A[iPivo] = tmp_p;
+   tmp_p = A[i1];
+   A[i1] = A[i2];
+   A[i2] = tmp_p;
 }
 
 /* ====================
