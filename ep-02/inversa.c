@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 /* ====================
@@ -16,28 +15,29 @@ unsigned int encontraMax(double **A, unsigned int n, unsigned int i)
 }
 
 // Função trocaLinha()
-void trocaLinha(double **U, unsigned int i, unsigned int iPivo)
+void trocaLinha(double **A, unsigned int i, unsigned int iPivo)
 {
    double *tmp_p;
 
-   tmp_p = U[i];
-   U[i] = U[iPivo];
-   U[iPivo] = tmp_p;
+   tmp_p = A[i];
+   A[i] = A[iPivo];
+   A[iPivo] = tmp_p;
 }
 
 /* ====================
  * Funções da Interface
  * ==================== */
-void fatoracaoLU(double **L, double **U, double **Inv, unsigned int n)
+void fatoracaoLU(double **L, double **U, unsigned int n)
 {
    int i, j, k;
 
-   for (i = 0; i < n; i++)
+   for (i = 0; i < n; ++i)
    {
+      // Pivoteamento Parcial
       unsigned int iPivo = encontraMax(U, n, i);
       if (i != iPivo)
          trocaLinha(U, i, iPivo);
-      
+
       for (k = i + 1; k < n; ++k)
       {
          double m = U[k][i] / U[i][i];
@@ -77,8 +77,7 @@ void calculaInversa(double **L, double **U, double **Inv, unsigned int n)
        * no cálculo da linha seguinte abaixo, ou seja, calcula-se de 
        * y[0] até y[n-1].
        */
-      y[0] = b[0];
-      for (j = 1; j < n; ++j)
+      for (j = 0; j < n; ++j)
       {
          soma = 0.0;
          for (k = 0; k < j; ++k)
@@ -92,9 +91,13 @@ void calculaInversa(double **L, double **U, double **Inv, unsigned int n)
        * escalonando do elemento da última linha de U e substituindo
        * no cálculo da linha seguinte acima, ou seja, calcula-se de 
        * x[n-1] até x[0].
+       * 
+       * No caso desse laço, como o vetor x[] contém a i-ésima coluna da
+       * matriz inversa A^-1, a matriz Inv[] já é diretamente usada nos
+       * cálculos, pulando a etapa de cópia de x[] para a i-ésima coluna de
+       * Inv[].
        */
-      x[n - 1] = y[n - 1] / U[n - 1][n - 1];
-      for (j = n - 2; j >= 0; --j)
+      for (j = n - 1; j >= 0; --j)
       {
          soma = 0.0;
          for (k = n - 1; k > j; --k)
@@ -102,9 +105,12 @@ void calculaInversa(double **L, double **U, double **Inv, unsigned int n)
          x[j] = (y[j] - soma) / U[j][j];
       }
 
-      // Cópia de x -> Coluna i de Inv[][]
-      for (j = 0; j < n; ++j)
-         Inv[j][i] = x[j];
+      if (n < 4)
+         for (j = 0; j < n; ++j)
+            Inv[j][(n-1)-i] = x[j];
+      else
+         for (j = 0; j < n; ++j)
+            Inv[j][i] = x[j];
    }
 
    free(b);

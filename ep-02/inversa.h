@@ -1,12 +1,15 @@
+#ifndef __INVERSA_H__
+#define __INVERSA_H__
+
 // Biblioteca inversa.h
 // Conteúdo: 02 funções
 
 // Função fatoracaoLU()
-/* Início: Recebe duas matrizes quadradas pré-processadas, L e U, e realiza
+/* Início: Recebe duas matrizes quadradas pré-processadas, L[] e U[], e realiza
  * o método de fatoração LU de uma matriz A, ou seja, a eliminação gaussiana em
- * cima de A. Inicialmente a diagonal principal de L deve ser 1 e U = A.
+ * cima de A[]. Inicialmente, L[] = I[n x n] e U[] = A[].
  * 
- * Final: L contém a matriz diagonal inferior da fatoração, armazenando
+ * Final: L[] contém a matriz diagonal inferior da fatoração, armazenando
  * os coeficientes da eliminação gaussiana, e U contém a matriz diagonal
  * superior da fatoração, armazenando a matriz resultante da eliminação
  * gaussiana.
@@ -14,7 +17,7 @@
  * Parâmetros:
  * - double **L: Matriz previamente alocada e processada L
  * - double **U: Matriz previamente alocada e processada U
- * - unsigned int n: Ordem/tamanho das matrizes L e U 
+ * - unsigned int n: Ordem/tamanho das matrizes L e U
  */
 void fatoracaoLU(double **L, double **U, unsigned int n);
 
@@ -34,3 +37,5 @@ void fatoracaoLU(double **L, double **U, unsigned int n);
  * - unsigned int n: Ordem/tamanho das matrizes L, U e Inv
  */
 void calculaInversa(double **L, double **U, double **Inv, unsigned int n);
+
+#endif

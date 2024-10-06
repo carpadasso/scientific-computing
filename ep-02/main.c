@@ -4,10 +4,13 @@
 
 #include "inversa.h"
 #include "matriz.h"
+#include "utils.h"
 
 int main()
 {
    double **A = NULL, **L = NULL, **U = NULL, **Inv = NULL;
+   double **I = NULL, **Mult = NULL, **R = NULL;
+   double tempo, norma;
    unsigned int n, i, j;
 
    // Lê a ordem da matriz A[n x n]
@@ -20,51 +23,76 @@ int main()
    U   = alocaMatriz(n);
    Inv = alocaMatriz(n);
 
-   if (A == NULL || L == NULL || U == NULL || Inv == NULL)
+   I = alocaMatriz(n);
+   Mult = alocaMatriz(n);
+   R = alocaMatriz(n);
+
+   // Caso não seja possível alocar espaço para uma das matrizes,
+   // libera as matrizes já alocadas e retorna.
+   if (A == NULL || L == NULL || U == NULL || Inv == NULL || 
+       I == NULL || Mult == NULL || R == NULL)
    {
       if (A != NULL)   liberaMatriz(A, n);
       if (L != NULL)   liberaMatriz(L, n);
       if (U != NULL)   liberaMatriz(U, n);
       if (Inv != NULL) liberaMatriz(Inv, n);
+
+      if (I != NULL)    liberaMatriz(I, n);
+      if (Mult != NULL) liberaMatriz(Mult, n);
+      if (R != NULL)    liberaMatriz(R, n);
       return 1;
    }
 
-   // Lê a matriz a ser invertida:
-   for (i = 0; i < n; ++i)
-      for (j = 0; j < n; ++j)
-         scanf("%lf", &A[i][j]);
+   // Lê a matriz a ser invertida, A[]
+   leMatriz(A, n);
 
-   // Arruma as matrizes L e U:
-   // L -> Diagonal Principal = 1
-   // U -> Cópia da matriz A
-   for (i = 0; i < n; ++i)
-      for (j = 0; j < n; ++j)
-         L[i][j] = ((i == j) ? 1 : 0);
-   
-   for (i = 0; i < n; ++i)
-      for (j = 0; j < n; ++j)
-         U[i][j] = A[i][j];
+   // Gera a matriz Identidade I[]
+   geraIdentidade(I, n);
 
+   // Pré-processamento das matrizes L[] e U[]
+   /* Copia a matriz A para U e a matriz identidade I para L */
+   copiaMatriz(A, U, n);
+   copiaMatriz(I, L, n);
+
+   // Parte I: Cálculo da Inversa
+   /* Primeiro, define-se o arrendodamento da máquina para baixo,
+    * depois se efetua a fatoração da matriz A em L e U e em seguida
+    * calcula-se a matriz inversa A^-1 a partir de L e U. */
    fesetround(FE_DOWNWARD);
+
+   tempo = timestamp();
    fatoracaoLU(L, U, n);
    calculaInversa(L, U, Inv, n);
+   tempo = timestamp() - tempo;
 
-   printf("\nRESULTADO DE L:\n");
-   imprimeMatriz(L, n);
+   // Parte II: Cálculo do Resíduo + Média das Normas
+   /* Multiplica-se a matriz A[] com sua inversa A^-1[] calculada no passo
+    * anterior, e em seguida subtrai o resultado com a Identidade I[] para
+    * resultar na matriz Resíduo R[]. Então calcula-se a norma L2 de cada
+    * coluna de R, e faz-se a média simples. */
+   multiplicaMatriz(A, Inv, Mult, n);
+   subtraiMatriz(Mult, I, R, n);
+   norma = calculaNorma(R, n);
 
-   printf("\n");
-   
-   printf("RESULTADO DE U:\n");
-   imprimeMatriz(U, n);
-
-   printf("\n");
-
-   printf("RESULTADO DE INV:\n");
+   // Impressão dos Dados
+   /* <ORDEM DA MATRIZ DE ENTRADA>
+    * <IMPRESSÃO DA MATRIZ INVERSA>
+    * <NORMA L2 DO RESÍDUO>
+    * <TEMPO EM MILISEGUNDOS NO CÁLCULO DA INVERSA> */
+   printf("%u\n", n);
    imprimeMatriz(Inv, n);
+   printf("%.15e\n", norma);
+   printf("%.8e\n", tempo);
 
-   if (A != NULL)   liberaMatriz(A, n);
-   if (L != NULL)   liberaMatriz(L, n);
-   if (U != NULL)   liberaMatriz(U, n);
-   if (Inv != NULL) liberaMatriz(Inv, n);
+   // Libera a memória alocada pelas Matrizes
+   liberaMatriz(A, n);
+   liberaMatriz(L, n);
+   liberaMatriz(U, n);
+   liberaMatriz(Inv, n);
+
+   liberaMatriz(I, n);
+   liberaMatriz(Mult, n);
+   liberaMatriz(R, n);
+
    return 0;
 }
